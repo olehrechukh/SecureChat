@@ -3,7 +3,6 @@
     <PropertyGroup>
         <TargetFramework>netstandard2.1</TargetFramework>
         <RazorLangVersion>3.0</RazorLangVersion>
-        <RootNamespace>EmailChecker.Client</RootNamespace>
         <!--		<ServiceWorkerAssetsManifest>service-worker-assets.js</ServiceWorkerAssetsManifest>-->
     </PropertyGroup>
 
@@ -23,10 +22,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Shared\EmailChecker.Shared.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
         <Folder Include="wwwroot\images" />
     </ItemGroup>
 
@@ -37,6 +32,10 @@
         <Content Update="Pages\SignalR.razor">
             <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
         </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Shared\Chat.Shared.csproj" />
     </ItemGroup>
 
 </Project>

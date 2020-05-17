@@ -1,0 +1,70 @@
+﻿@using Microsoft.Extensions.Logging
+@inject ILogger<Modal> Logger
+
+
+<div class="modal @ModalClass" tabindex="-1" role="dialog" style="display:@ModalDisplay">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Start communication</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" @onclick="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>@_connectionId want to start commnication</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" @onclick="AcceptConnection">Accept connection</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" @onclick="Close">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@if (ShowBackdrop)
+{
+    <div class="modal-backdrop fade show"></div>
+}
+
+
+@code {
+    public EventHandler<string> OnAccepted;
+
+    public string ModalDisplay = "none;";
+    public string ModalClass = "";
+    public bool ShowBackdrop;
+    private string _connectionId;
+    Func<Task> _func;
+    public void Open(string connectionId, Func<Task> func)
+    {
+        Logger.LogInformation("open modal");
+        _connectionId = connectionId;
+        _func = func;
+        ModalDisplay = "block;";
+        ModalClass = "Show";
+        ShowBackdrop = true;
+        StateHasChanged();
+    }
+
+    public void Close()
+    {
+        Logger.LogInformation("close modal");
+
+        ModalDisplay = "none";
+        ModalClass = "";
+        ShowBackdrop = false;
+        StateHasChanged();
+    }
+
+    private async Task AcceptConnection()
+    {
+        Logger.LogInformation("accept modal");
+
+        OnAccepted?.Invoke(this, _connectionId);
+        Close();
+        await _func();
+    }
+
+}

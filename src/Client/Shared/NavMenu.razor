@@ -1,5 +1,5 @@
 ﻿<div class="top-row pl-4 navbar navbar-dark">
-    <a class="navbar-brand" href="">Email checker</a>
+    <a class="navbar-brand" href="">Logotype</a>
     <button class="navbar-toggler" @onclick="ToggleNavMenu">
         <span class="navbar-toggler-icon"></span>
     </button>
@@ -9,24 +9,30 @@
     <ul class="nav flex-column">
         <li class="nav-item px-3">
             <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Home
+                <span class="oi oi-check" aria-hidden="true"></span> Email checker
             </NavLink>
         </li>
         <li class="nav-item px-3">
-            <NavLink class="nav-link" href="/emailChecker">
-                <span class="oi oi-plus" aria-hidden="true"></span> Barcode
+            <NavLink class="nav-link" href="/technology">
+                <span class="oi oi-terminal" aria-hidden="true"></span> Technology
+            </NavLink>
+        </li>
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" href="/signalR">
+                <span class="oi oi-signal" aria-hidden="true"></span> SignalR
             </NavLink>
         </li>
     </ul>
 </div>
 
 @code {
-    private bool collapseNavMenu = true;
+    private bool _collapseNavMenu = true;
 
-    private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+    private string NavMenuCssClass => _collapseNavMenu ? "collapse" : null;
 
     private void ToggleNavMenu()
     {
-        collapseNavMenu = !collapseNavMenu;
+        _collapseNavMenu = !_collapseNavMenu;
     }
+
 }

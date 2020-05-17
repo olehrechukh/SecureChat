@@ -1,5 +1,6 @@
 ﻿syntax = "proto3";
-option csharp_namespace = "EmailChecker.Shared";
+import "google/protobuf/empty.proto";
+option csharp_namespace = "Chat.Shared";
 package Services;
 
 service EmailValidator {
@@ -11,5 +12,15 @@ message EmailValidateRequest {
 }
 
 message EmailValidateReply {
-  string message = 1;
+  bool isSuccess = 1;
+  string errorMessage = 2;
+}
+
+service RsaGenerator{
+  rpc GenerateKeys(google.protobuf.Empty) returns (RsaKeysReply);
+}
+
+message RsaKeysReply {
+  string publicKey = 1;
+  string privateKey = 2;
 }

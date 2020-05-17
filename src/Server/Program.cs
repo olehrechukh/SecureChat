@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 
-namespace EmailChecker.Server
+namespace Chat.Server
 {
     public class Program
     {

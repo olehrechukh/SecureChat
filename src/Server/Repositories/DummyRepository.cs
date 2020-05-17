@@ -1,4 +1,4 @@
-﻿namespace EmailChecker.Server.Repositories
+﻿namespace Chat.Server.Repositories
 {
     public interface IRepository
     {

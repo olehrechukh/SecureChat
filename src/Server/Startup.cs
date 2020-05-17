@@ -1,13 +1,16 @@
-using EmailChecker.Server.GrpcServices;
-using EmailChecker.Server.Repositories;
-using EmailChecker.Server.Services;
+using System.Linq;
+using Chat.Server.GrpcServices;
+using Chat.Server.Hubs;
+using Chat.Server.Repositories;
+using Chat.Server.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace EmailChecker.Server
+namespace Chat.Server
 {
     public class Startup
     {
@@ -24,9 +27,16 @@ namespace EmailChecker.Server
         {
             services.AddScoped<IRepository, DummyRepository>();
             services.AddScoped<EmailCheckerService>();
+            services.AddHostedService<HubBackgroundWorker>();
             services.AddControllersWithViews();
             services.AddRazorPages();
             services.AddGrpc();
+            services.AddSignalR();
+            services.AddResponseCompression(opts =>
+            {
+                opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
+                    new[] { "application/octet-stream" });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -56,6 +66,8 @@ namespace EmailChecker.Server
                 endpoints.MapRazorPages();
                 endpoints.MapFallbackToFile("index.html");
                 endpoints.MapGrpcService<EmailValidateService>().EnableGrpcWeb();
+                endpoints.MapGrpcService<RsaGeneratorService>().EnableGrpcWeb();
+                endpoints.MapHub<ChatHub>("/chatHub");
             });
         }
     }

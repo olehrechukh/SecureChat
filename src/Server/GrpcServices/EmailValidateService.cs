@@ -1,12 +1,27 @@
 ﻿using System.Threading.Tasks;
-using EmailChecker.Shared;
-using EmailChecker.Server.Repositories;
-using EmailChecker.Server.Services;
+using Chat.Server.Services;
+using Chat.Shared;
 using Grpc.Core;
 using Microsoft.Extensions.Logging;
 
-namespace EmailChecker.Server.GrpcServices
+namespace Chat.Server.GrpcServices
 {
+    public class ValidationResult
+    {
+        public readonly bool IsSuccess;
+        public readonly string ErrorMessage;
+
+        private ValidationResult(bool isSuccess, string errorMessage)
+        {
+            IsSuccess = isSuccess;
+            ErrorMessage = errorMessage;
+        }
+
+        public static ValidationResult Success => new ValidationResult(true, string.Empty);
+
+        public static ValidationResult Error(string message) => new ValidationResult(false, message);
+    }
+
     public class EmailValidateService : EmailValidator.EmailValidatorBase
     {
         private readonly ILogger<EmailValidateService> _logger;
@@ -23,7 +38,7 @@ namespace EmailChecker.Server.GrpcServices
             _logger.LogInformation("Input {request}", request);
             var result = _service.Validate(request.Email);
 
-            var reply = new EmailValidateReply {Message = result ? "Valide" : "Invalide"};
+            var reply = new EmailValidateReply {ErrorMessage = result.ErrorMessage, IsSuccess = result.IsSuccess};
 
             return Task.FromResult(reply);
         }

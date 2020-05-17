@@ -1,17 +1,22 @@
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
-using EmailChecker.Shared;
-using Grpc.Net.Client;
-using Grpc.Net.Client.Web;
+using Blazor.Extensions.Logging;
+using Chat.Shared;
+using Chat.Shared.SignalR;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
-namespace EmailChecker.Client
+namespace Chat.Client
 {
     public class Program
     {
+        private static readonly TimeSpan[] ReconnectDelays =
+            {TimeSpan.Zero, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(5)};
+
         public static async Task Main(string[] args)
         {
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
@@ -24,16 +29,20 @@ namespace EmailChecker.Client
         private static void ConfigureServices(IServiceCollection collection, string baseAdders)
         {
             collection.AddTransient(sp => new HttpClient {BaseAddress = new Uri(baseAdders)});
-            collection.AddSingleton(services =>
-            {
-                // Create a gRPC-Web channel pointing to the backend server
-                var httpClient = new HttpClient(new GrpcWebHandler(GrpcWebMode.GrpcWeb, new HttpClientHandler()));
-                var baseUri = services.GetRequiredService<NavigationManager>().BaseUri;
-                var channel = GrpcChannel.ForAddress(baseUri, new GrpcChannelOptions {HttpClient = httpClient});
+            collection.AddGrpcClient(channel => new EmailValidator.EmailValidatorClient(channel));
+            collection.AddGrpcClient(channel => new RsaGenerator.RsaGeneratorClient(channel));
 
-                // Now we can instantiate gRPC clients for this channel
-                return new EmailValidator.EmailValidatorClient(channel);
+            collection.AddScoped(provider =>
+            {
+                var navigationManager = provider.GetService<NavigationManager>();
+                var hubConnection = new HubConnectionBuilder()
+                    .WithUrl(navigationManager.ToAbsoluteUri("/chatHub"))
+                    .WithAutomaticReconnect(ReconnectDelays)
+                    .Build();
+                return new ChatHubClient(hubConnection);
             });
+
+            collection.AddLogging(builder => builder.AddBrowserConsole().SetMinimumLevel(LogLevel.Information));
         }
     }
 }

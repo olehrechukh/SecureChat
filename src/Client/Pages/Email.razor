@@ -1,0 +1,62 @@
+﻿@page "/"
+@using Chat.Shared
+@inject EmailValidator.EmailValidatorClient EmailClient
+
+<h1>Invoke gRPC service</h1>
+<div class="row">
+    <div class="form-group col-md-10">
+        <div class="input-group">
+            <input type="email" @bind="_value" class="form-control" placeholder="Checked email" aria-label="Recipient's username" aria-describedby="basic-addon2" required>
+            <div class="input-group-append">
+                <span class="input-group-text" id="basic-addon2">example@e.com</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <button class="btn btn-light-dark btn-block" @onclick="CheckEmail">Check</button>
+    </div>
+</div>
+
+<div>
+    @if (_loading)
+    {
+        <div class="text-center">
+            <div class="spinner-border" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+    }
+    @if (_response != string.Empty)
+    {
+        <div class="alert alert-check" role="alert">
+            @_response
+        </div>
+    }
+
+</div>
+
+<p class="text-justify mt-1">
+    Email Checker is a simple tool for verifying an email address. It's free and quite easy to use. Just enter the email address and hit check button. Then it tells you whether the email address is real or not. It extracts the MX records from the email address and connect to mail server (over SMTP and also simulates sending a message) to make sure the mailbox really exist for that user/address. Some mail servers do not co-operate in the process, in such cases, the result of this email verification tool may not be as accurate as expected.
+</p>
+
+@code {
+    string _value = string.Empty;
+    string _response = string.Empty;
+    bool _loading;
+
+    async Task CheckEmail()
+    {
+        if (_value == string.Empty)
+        {
+            return;
+        }
+        _response = string.Empty;
+        _loading = true;
+        var request = new EmailValidateRequest {Email = _value};
+        var reply = await EmailClient.ValidateEmailAsync(request);
+
+        _loading = false;
+        _response = reply.GetOutputString(_value);
+    }
+
+}

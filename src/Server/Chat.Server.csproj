@@ -2,7 +2,6 @@
 
     <PropertyGroup>
         <TargetFramework>netcoreapp3.1</TargetFramework>
-        <RootNamespace>EmailChecker.Server</RootNamespace>
         <UserSecretsId>2ed15951-4dc9-4774-8c99-68e549a66703</UserSecretsId>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     </PropertyGroup>
@@ -20,7 +19,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Client\Chat.Client.csproj" />
-        <ProjectReference Include="..\Shared\EmailChecker.Shared.csproj" />
+        <ProjectReference Include="..\Shared\Chat.Shared.csproj" />
     </ItemGroup>
 
 

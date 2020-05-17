@@ -3,11 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30021.99
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmailChecker.Client", "EmailChecker\Client\EmailChecker.Client.csproj", "{FC627FC4-EC87-4267-A7E3-DE28CB08C61C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chat.Client", "Client\Chat.Client.csproj", "{FC627FC4-EC87-4267-A7E3-DE28CB08C61C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmailChecker.Server", "EmailChecker\Server\EmailChecker.Server.csproj", "{06991B84-CC0F-46F7-8580-578190AE3A67}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chat.Server", "Server\Chat.Server.csproj", "{06991B84-CC0F-46F7-8580-578190AE3A67}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmailChecker.Shared", "EmailChecker\Shared\EmailChecker.Shared.csproj", "{F408AAB4-3AED-4274-B193-C510BE3B5FEB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chat.Shared", "Shared\Chat.Shared.csproj", "{F408AAB4-3AED-4274-B193-C510BE3B5FEB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{23B4FCDF-2C14-458B-88F2-757C5B567CFF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chat.Shared.Tests", "Chat.Shared.Tests\Chat.Shared.Tests.csproj", "{D2FABFBD-A679-4EC0-BFB9-49E5AA985095}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,11 +31,18 @@ Global
 		{F408AAB4-3AED-4274-B193-C510BE3B5FEB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F408AAB4-3AED-4274-B193-C510BE3B5FEB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F408AAB4-3AED-4274-B193-C510BE3B5FEB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D2FABFBD-A679-4EC0-BFB9-49E5AA985095}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D2FABFBD-A679-4EC0-BFB9-49E5AA985095}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D2FABFBD-A679-4EC0-BFB9-49E5AA985095}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D2FABFBD-A679-4EC0-BFB9-49E5AA985095}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {20EEC2C1-2B40-466B-AD47-5CF2213128DE}
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{D2FABFBD-A679-4EC0-BFB9-49E5AA985095} = {23B4FCDF-2C14-458B-88F2-757C5B567CFF}
 	EndGlobalSection
 EndGlobal

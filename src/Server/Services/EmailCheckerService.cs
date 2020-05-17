@@ -2,9 +2,10 @@
 using System.Net;
 using System.Text.RegularExpressions;
 using ActiveUp.Net.Mail;
+using Chat.Server.GrpcServices;
 using Microsoft.Extensions.Logging;
 
-namespace EmailChecker.Server.Services
+namespace Chat.Server.Services
 {
     public class EmailCheckerService
     {
@@ -15,11 +16,11 @@ namespace EmailChecker.Server.Services
             _logger = logger;
         }
 
-        public bool Validate(string address)
+        public ValidationResult Validate(string address)
         {
             if (!ValidateSyntax(address))
             {
-                return false;
+                return ValidationResult.Error("Incorrect email syntax");
             }
 
             try
@@ -37,7 +38,10 @@ namespace EmailChecker.Server.Services
                 }
 
                 if (recordCollection.Count <= 0)
-                    return false;
+                {
+                    return ValidationResult.Error("Incorrect dns");
+                }
+
                 smtpClient.Connect(recordCollection.GetPrefered().Exchange);
                 try
                 {
@@ -48,10 +52,10 @@ namespace EmailChecker.Server.Services
                     smtpClient.Helo(Dns.GetHostName());
                 }
 
-                bool flag;
+                ValidationResult flag;
                 if (smtpClient.Verify(address))
                 {
-                    flag = true;
+                    flag = ValidationResult.Success;
                 }
                 else
                 {
@@ -59,12 +63,12 @@ namespace EmailChecker.Server.Services
                     {
                         smtpClient.MailFrom("postmaster@" + address1);
                         smtpClient.RcptTo(address);
-                        flag = true;
+                        flag = ValidationResult.Success;
                     }
                     catch (Exception ex)
                     {
                         _logger.LogInformation(ex.ToString());
-                        flag = false;
+                        flag = ValidationResult.Error("Email doest not exist");
                     }
                 }
 
@@ -73,7 +77,7 @@ namespace EmailChecker.Server.Services
             }
             catch
             {
-                return false;
+                return ValidationResult.Error("Unknown error");
             }
         }
 

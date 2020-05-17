@@ -1,0 +1,211 @@
+﻿@page "/signalR"
+
+@using Microsoft.AspNetCore.SignalR.Client
+@using Google.Protobuf.WellKnownTypes
+@using Microsoft.Extensions.Logging
+@using Chat.Shared.SignalR
+@using Chat.Shared
+
+@inject ChatHubClient ChatHubClient
+@inject RsaGenerator.RsaGeneratorClient RsaGeneratorClient
+@inject ILogger<SignalR> Logger
+
+@implements IDisposable
+
+
+<Modal @ref="Modal"></Modal>
+
+<div class="text-right">
+    <span type="button" class="badge @GetBadgeStyle()">@ChatHubClient.State</span >
+</div>
+@if (_connectionId != null)
+{
+    <div class="input-group">
+        <span>Connection id: </span>
+
+        <div class="input-group-prepend">
+            <span class="input-group-text">@_connectionId</span>
+        </div>
+    </div>
+}
+<div class="input-group">
+    <span>Received state : </span>
+
+    <div class="input-group-prepend">
+        <span class="input-group-text">@_communicationState</span>
+    </div>
+</div><hr>
+
+@if (_communicationState == CommunicationState.Connected)
+{
+    <div>
+        <div class="form-group">
+            <input type="text" class="form-control" placeholder="Message" @bind="_messageInput">
+        </div>
+        <div class="text-right">
+            <button @onclick="Send" disabled="@(!ChatHubClient.IsConnected)" class="btn btn-primary text-center">Send</button>
+        </div>
+    </div>
+}
+
+@if (_communicationState != CommunicationState.Connected)
+{
+    <div>
+        <div class="form-group">
+            <input type="text" class="form-control" placeholder="Receiver id" @bind="_receiverConnectionId">
+        </div>
+        <div class="text-right">
+            <button @onclick="StartCommunication" disabled="@(!ChatHubClient.IsConnected)" class="btn btn-primary text-center">Connect</button>
+        </div>
+    </div>
+}
+else
+{
+    <button @onclick="Disconnect" disabled="@(!ChatHubClient.IsConnected)" class="btn btn-primary text-center">Disconnect</button>
+}
+<hr>
+
+<ul id="messagesList">
+    @foreach (var message in _messages)
+    {
+        <div class="@message.Css">
+            <div class="user">@message.ConnectionId</div>
+            <div class="msg">@message.Text</div>
+        </div>
+    }
+</ul>
+
+@code {
+    private readonly List<Message> _messages = new List<Message>();
+    private string _messageInput;
+    private string _connectionId;
+    private string _receiverConnectionId;
+    private string _privateKey;
+    private string _publicKey;
+    private Modal Modal = new Modal();
+
+    CommunicationState _communicationState = CommunicationState.Unconnected;
+
+    protected override Task OnInitializedAsync()
+    {
+        Logger.LogInformation("OnInitializedAsync");
+        ChatHubClient.HandshakeReceived += ChatHubClientOnHandshakeReceived;
+        ChatHubClient.MessageReceived += ChatHubClientOnMessageReceived;
+        ChatHubClient.StateWasChanged += ChatHubClientOnStateWasChanged;
+        ChatHubClient.ErrorCommunicationReceived += ChatHubClientOnErrorCommunicationReceived;
+        ChatHubClient.DisconnectReceived += ChatHubClientOnDisconnectReceived;
+        ChatHubClient.SuccessCommunicationReceived += ChatHubClientOnSuccessCommunicationReceived;
+        ChatHubClient.RequestStartReceived += ChatHubClientOnRequestStartReceived;
+        return ChatHubClient.StartAsync();
+    }
+
+    private void ChatHubClientOnRequestStartReceived(object sender, string e)
+    {
+        Modal.Open(e, () =>  StartCommunication(e));
+    }
+
+    private async void OnAccepted(object sender, string e)
+    {
+        Logger.LogInformation("OnAccepted");
+
+        try
+        {
+            await StartCommunication(e);
+        }
+        catch (Exception exception)
+        {
+            Logger.LogError(exception, "error");
+        }
+    }
+
+    private void ChatHubClientOnSuccessCommunicationReceived(object sender, string key)
+    {
+        _publicKey = key;
+        _communicationState = CommunicationState.Connected;
+        StateHasChanged();
+    }
+
+    private void ChatHubClientOnDisconnectReceived(object sender, string e)
+    {
+        _communicationState = CommunicationState.Disconnected;
+        StateHasChanged();
+    }
+
+    private void ChatHubClientOnErrorCommunicationReceived(object sender, string e)
+    {
+        _communicationState = CommunicationState.FailedToConnect;
+        StateHasChanged();
+    }
+
+    private void ChatHubClientOnStateWasChanged(object sender, HubConnectionState e) => StateHasChanged();
+
+    private void ChatHubClientOnMessageReceived(object sender, MessageReceived arg)
+    {
+        var decrypted = SecurityService.DecryptData(_privateKey, arg.Message);
+        _messages.Add(new Message(arg.User, decrypted, false));
+        StateHasChanged();
+    }
+
+    private void ChatHubClientOnHandshakeReceived(object sender, string connectionId)
+    {
+        _connectionId = connectionId;
+        StateHasChanged();
+    }
+
+    private async Task Send()
+    {
+        _messages.Add(new Message(_connectionId, _messageInput, true));
+        var encryptText = SecurityService.EncryptText(_publicKey, _messageInput);
+        await ChatHubClient.SendMessage(encryptText);
+        _messageInput = string.Empty;
+    }
+
+    private string GetBadgeStyle() => ChatHubClient.State switch
+    {
+        HubConnectionState.Connected => "badge-success",
+        HubConnectionState.Connecting => "badge-light",
+        HubConnectionState.Reconnecting => "badge-warning",
+        HubConnectionState.Disconnected =>"badge-danger",
+        _ => throw new ArgumentOutOfRangeException(nameof(ChatHubClient.State), ChatHubClient.State.ToString())
+        };
+
+    private Task StartCommunication()
+    {
+        return StartCommunication(_receiverConnectionId);
+    }
+
+    private async Task StartCommunication(string connectionId)
+    {
+        Logger.LogInformation("Start generating key");
+
+        var keys = await RsaGeneratorClient.GenerateKeysAsync(new Empty());
+
+        Logger.LogInformation("End generating key");
+        _privateKey = keys.PrivateKey;
+        _communicationState = CommunicationState.WaitConnect;
+        await ChatHubClient.StartCommunication(connectionId, keys.PublicKey);
+    }
+
+    private async Task Disconnect()
+    {
+        await ChatHubClient.Disconnect(_receiverConnectionId);
+
+        _communicationState = CommunicationState.Unconnected;
+        _receiverConnectionId = null;
+        _messages.Clear();
+    }
+
+    public void Dispose()
+    {
+        Logger.LogInformation("Dispose");
+        ChatHubClient.HandshakeReceived += ChatHubClientOnHandshakeReceived;
+        ChatHubClient.MessageReceived += ChatHubClientOnMessageReceived;
+        ChatHubClient.StateWasChanged += ChatHubClientOnStateWasChanged;
+        ChatHubClient.ErrorCommunicationReceived += ChatHubClientOnErrorCommunicationReceived;
+        ChatHubClient.DisconnectReceived += ChatHubClientOnDisconnectReceived;
+        ChatHubClient.SuccessCommunicationReceived += ChatHubClientOnSuccessCommunicationReceived;
+
+        ChatHubClient.DisposeAsync();
+    }
+
+}

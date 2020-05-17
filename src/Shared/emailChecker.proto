@@ -1,0 +1,15 @@
+﻿syntax = "proto3";
+option csharp_namespace = "EmailChecker.Shared";
+package Services;
+
+service EmailValidator {
+  rpc ValidateEmail (EmailValidateRequest) returns (EmailValidateReply);
+}
+
+message EmailValidateRequest {
+  string email = 1;
+}
+
+message EmailValidateReply {
+  string message = 1;
+}

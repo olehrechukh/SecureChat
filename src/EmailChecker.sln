@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30021.99
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmailChecker.Client", "EmailChecker\Client\EmailChecker.Client.csproj", "{FC627FC4-EC87-4267-A7E3-DE28CB08C61C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmailChecker.Server", "EmailChecker\Server\EmailChecker.Server.csproj", "{06991B84-CC0F-46F7-8580-578190AE3A67}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmailChecker.Shared", "EmailChecker\Shared\EmailChecker.Shared.csproj", "{F408AAB4-3AED-4274-B193-C510BE3B5FEB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FC627FC4-EC87-4267-A7E3-DE28CB08C61C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FC627FC4-EC87-4267-A7E3-DE28CB08C61C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FC627FC4-EC87-4267-A7E3-DE28CB08C61C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FC627FC4-EC87-4267-A7E3-DE28CB08C61C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{06991B84-CC0F-46F7-8580-578190AE3A67}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{06991B84-CC0F-46F7-8580-578190AE3A67}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{06991B84-CC0F-46F7-8580-578190AE3A67}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{06991B84-CC0F-46F7-8580-578190AE3A67}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F408AAB4-3AED-4274-B193-C510BE3B5FEB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F408AAB4-3AED-4274-B193-C510BE3B5FEB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F408AAB4-3AED-4274-B193-C510BE3B5FEB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F408AAB4-3AED-4274-B193-C510BE3B5FEB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {20EEC2C1-2B40-466B-AD47-5CF2213128DE}
+	EndGlobalSection
+EndGlobal
